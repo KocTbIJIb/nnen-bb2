@@ -1,0 +1,7 @@
+/assets/
+/protected/runtime/
+/themes/classic/views/
+/vendor
+/.env
+composer.lock
+composer.phar
