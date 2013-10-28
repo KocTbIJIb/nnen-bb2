@@ -2,9 +2,9 @@
 
 class IndexController extends Controller
 {
-	public function actionIndex()
-	{
-		$this->renderPartial('index');
-	}
+    public function actionIndex()
+    {
+        $this->renderPartial('index');
+    }
 
 }

@@ -6,9 +6,13 @@ return array_replace_recursive(
     require dirname(__FILE__) . '/main.php', 
     array(
         'components' => array(
-            'mongodb' => array(
-                'server' => 'mongodb://localhost:27017'
-            ),
+            'db'=>array(
+                'connectionString' => 'mysql:host=nnen.ru;dbname=bb',
+                'emulatePrepare' => true,
+                'username' => 'bb',
+                'password' => 'RLYVpUSAv7P5YHXA',
+                'charset' => 'utf8',
+            )
         ),
     )
 );

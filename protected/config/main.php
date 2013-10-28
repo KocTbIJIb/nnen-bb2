@@ -39,7 +39,7 @@ return array(
             'class' => 'WebUser',
             'allowAutoLogin'=>true,
             'loginUrl'=>array('index/index'),
-            'returnUrl' => array('/personal/domains')
+            'returnUrl' => array('index/index')
         ),
         // uncomment the following to enable URLs in path-format
         'urlManager'=>array(

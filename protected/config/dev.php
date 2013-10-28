@@ -10,10 +10,10 @@ return array_replace_recursive(
     array(
         'components' => array(
             'db'=>array(
-                'connectionString' => 'mysql:host=localhost;dbname=nnen',
+                'connectionString' => 'mysql:host=nnen.ru;dbname=bb',
                 'emulatePrepare' => true,
-                'username' => 'root',
-                'password' => 'root',
+                'username' => 'bb',
+                'password' => 'RLYVpUSAv7P5YHXA',
                 'charset' => 'utf8',
             )
         )
