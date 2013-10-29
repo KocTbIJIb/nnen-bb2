@@ -84,5 +84,8 @@ return array(
     'params'=>array(
         // this is used in contact page
         'adminEmail'=>'fadfromdoost@yandex.ru',
+        'smsApiUrl' => 'http://sms.ru/sms/send',
+        'smsApiKey' => '61a669a3-6278-50a4-fd89-72dc20742dea',
+        'myNumber' => '79200024144'
     ),
 );
