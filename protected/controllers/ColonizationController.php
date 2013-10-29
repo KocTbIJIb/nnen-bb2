@@ -103,7 +103,12 @@ class ColonizationController extends EnController
             $this->_sendResponse(array('status' => 'win', 'code' => $this->preWinCode));    
         }
         
-        $this->_sendResponse(array('status' => 'game', 'objects' => $this->team->objects, 'message' => $message));
+        $this->_sendResponse(array(
+            'status' => 'game', 
+            'objects' => $this->team->objects, 
+            'message' => $message,
+            'team' => $this->team->name
+        ));
     }
 
 }
