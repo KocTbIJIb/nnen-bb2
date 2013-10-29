@@ -2,14 +2,13 @@ $(document).ready(function(){
     var url = "http://nnen.ru/colonization/start";
     var data = {};
     
-    var team_hash = $(".team_hash");
+    var team_hash = $(".team_hash").eq(0);
     if (!team_hash.length || team_hash.val().length < 32) {
         alert('Unauthorized');
         return;
     }
     data.team_hash = team_hash.val();
     data.sectors = collectSectors();
-    //data.units = collectUnits();
 
     postCORS(url, data, responseProcessing);
 });
@@ -18,14 +17,6 @@ function collectSectors() {
     var codes = [];
     $('.cols-wrapper .cols .color_correct').each(function(i){
         codes.push($(this).html());
-    });
-    return codes;
-}
-
-function collectUnits() {
-    var codes = [];
-    $('.mr2-sc-units').each(function(i){
-        codes.push($(this).val());
     });
     return codes;
 }
