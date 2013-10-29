@@ -7,7 +7,7 @@ return array_replace_recursive(
     array(
         'components' => array(
             'db'=>array(
-                'connectionString' => 'mysql:host=nnen.ru;dbname=bb',
+                'connectionString' => 'mysql:host=localhost;dbname=bb',
                 'emulatePrepare' => true,
                 'username' => 'bb',
                 'password' => 'RLYVpUSAv7P5YHXA',
