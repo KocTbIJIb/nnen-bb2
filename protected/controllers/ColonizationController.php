@@ -107,7 +107,7 @@ class ColonizationController extends EnController
             'status' => 'game', 
             'objects' => $this->team->objects, 
             'message' => $message,
-            'team' => $this->team->name
+            'team' => htmlspecialchars($this->team->name)
         ));
     }
 
