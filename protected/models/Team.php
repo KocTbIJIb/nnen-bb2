@@ -33,12 +33,18 @@ class Team extends CActiveRecord
             } else if ($object->type == 'road') {
                 $roads++;
             }
-            /*$criteria = new CDbCriteria;
-            $criteria->with = array('neighbors');
-            $fullObject = Object::model()->findByPk($object->id, $criteria);
-            */
         }
         return $towns == 2 && $roads == 2;
+    }
+
+    public function countObjectsNum($type = 'town') {
+        $num = 0;
+        foreach ($this->objects as $object) {
+            if ($object->type == $type) {
+                $num++;
+            }
+        }
+        return $num;
     }
 
     public function getNewCodes($codes, $alias) {

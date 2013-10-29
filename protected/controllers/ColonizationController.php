@@ -35,25 +35,29 @@ class ColonizationController extends EnController
                 //Если это первый город, проверять нечего, просто строим
                 $ok = true;
             } else if ($object->type == 'town') {
-                $ok = true;
-                //Переберём все уже созданые города потому, что...
-                foreach ($this->team->objects as $team_object) {
-                    if ($team_object->type != 'town') {
-                        continue;
-                    }
-                    $criteria = new CDbCriteria;
-                    $criteria->with = array('neighbors');
-                    $fullObject = Object::model()->findByPk($team_object->id, $criteria);
-                    //..если есть общий сосед и этот сосед дорога, то строить такой город нельзя
-                    foreach ($fullObject->neighbors as $currentNeighbor) {
-                        if (in_array($currentNeighbor->id, CHtml::listData($object->neighbors, 'id', 'id')) && $currentNeighbor->type == 'road') {
-                            $message[] = 'На этом этапе растояние между городами не должно быть менее двух дорог!';
-                            $ok = false;
+                if ($this->team->countObjectsNum('town') >= 2) {
+                    $message[] = 'На этом этапе вы можете построить не более двух городов!';
+                } else {
+                    $ok = true;
+                    //Переберём все уже созданые города потому, что...
+                    foreach ($this->team->objects as $team_object) {
+                        if ($team_object->type != 'town') {
+                            continue;
+                        }
+                        $criteria = new CDbCriteria;
+                        $criteria->with = array('neighbors');
+                        $fullObject = Object::model()->findByPk($team_object->id, $criteria);
+                        //..если есть общий сосед и этот сосед дорога, то строить такой город нельзя
+                        foreach ($fullObject->neighbors as $currentNeighbor) {
+                            if (in_array($currentNeighbor->id, CHtml::listData($object->neighbors, 'id', 'id')) && $currentNeighbor->type == 'road') {
+                                $message[] = 'На этом этапе растояние между городами не должно быть менее двух дорог!';
+                                $ok = false;
+                                break;
+                            }
+                        }
+                        if (!$ok) {
                             break;
                         }
-                    }
-                    if (!$ok) {
-                        break;
                     }
                 }
             } else if ($object->type == 'road') {
