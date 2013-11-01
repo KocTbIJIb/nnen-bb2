@@ -19,6 +19,7 @@ class Team extends CActiveRecord
             'balance' => array(self::HAS_ONE, 'Balance', 'team_id'),
             'cha_team_codes' => array(self::HAS_MANY, 'ChaTeamCode', 'team_id'),
             'total' => array(self::HAS_ONE, 'Total', 'team_id'),
+            'team_labels' => array(self::HAS_MANY, 'TeamLabel', 'team_id'),
         );
     }
 
@@ -176,11 +177,11 @@ class Team extends CActiveRecord
         $sql = 'SELECT t.id, t.name, tot.total
                 FROM `teams` AS `t` 
                 LEFT JOIN `cha_team_total` AS tot ON t.id = tot.team_id 
-                WHERE 1
+                WHERE tot.total IS NOT NULL
                 ORDER BY tot.total ASC';
         $teams = Yii::app()->db->createCommand($sql)->queryAll();
         foreach ($teams as $key => $team) {
-            $teams[$key]['name'] = htmlspecialchars($team->name);
+            $teams[$key]['name'] = htmlspecialchars($team['name']);
         }
         return $teams;
     }

@@ -100,9 +100,8 @@ class ColonizationController extends EnController
                 $to->save();
             }
 
+            $this->team->refresh();
         }
-
-        $this->team->refresh();
 
         if ($this->team->checkForColPreWin()) {
             $this->_sendResponse(array('status' => 'win', 'code' => $this->preWinCode));    
