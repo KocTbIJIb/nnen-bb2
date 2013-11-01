@@ -73,7 +73,7 @@ class Team extends CActiveRecord
         } else {
             $balance = Balance::model()->findByPk($this->id);
         }
-        $balance->{$resource->object->resource_type}+= 1;
+        $balance->{$resource->resource_type}+= 1;
         return $balance->save();
     }
 
@@ -114,6 +114,9 @@ class Team extends CActiveRecord
     }
 
     public function isEnoughMoney($money) {
+        if (empty($this->balance)) {
+            return false;
+        }
         foreach ($money as $key => $value) {
             if (intval($this->balance->{$key}) < $value) {
                 return false;
@@ -144,6 +147,9 @@ class Team extends CActiveRecord
 
     public function charge($money) {
         $balance = Balance::model()->findByPk($this->id);
+        if (empty($balance)) {
+            return false;
+        }
 
         foreach ($money as $key => $value) {
             if (intval($balance->{$key}) < $value) {

@@ -229,7 +229,7 @@ class ColonizationController extends EnController
             if (!$this->team->checkObjectAccessibility($resource->object)) {
                 $message[] = $resource->object->name . ' пока не доступен вашей команде!';
             } else {
-                if (!$this->team->updateBalanceByResource($resource)) {
+                if (!$this->team->updateBalanceByResource($resource->object)) {
                     continue;
                 }
             }
