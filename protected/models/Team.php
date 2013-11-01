@@ -17,6 +17,8 @@ class Team extends CActiveRecord
             'col_team_codes' => array(self::HAS_MANY, 'ColTeamCode', 'team_id'),
             'objects' => array(self::MANY_MANY, 'Object', 'col_team_objects(team_id, object_id)'),
             'balance' => array(self::HAS_ONE, 'Balance', 'team_id'),
+            'cha_team_codes' => array(self::HAS_MANY, 'ChaTeamCode', 'team_id'),
+            'total' => array(self::HAS_ONE, 'Total', 'team_id'),
         );
     }
 
@@ -165,12 +167,21 @@ class Team extends CActiveRecord
         $balance = Balance::model()->findByPk($this->id);
 
         foreach ($money as $key => $value) {
-            if (intval($balance->{$key}) < $value) {
-                return false;
-            } else {
-                $balance->{$key}+= $value;
-            }
+            $balance->{$key}+= $value;
         }
         return $balance->save();
+    }
+
+    public function getTeamsTotalList() {
+        $sql = 'SELECT t.id, t.name, tot.total
+                FROM `teams` AS `t` 
+                LEFT JOIN `cha_team_total` AS tot ON t.id = tot.team_id 
+                WHERE 1
+                ORDER BY tot.total ASC';
+        $teams = Yii::app()->db->createCommand($sql)->queryAll();
+        foreach ($teams as $key => $team) {
+            $teams[$key]['name'] = htmlspecialchars($team->name);
+        }
+        return $teams;
     }
 }
