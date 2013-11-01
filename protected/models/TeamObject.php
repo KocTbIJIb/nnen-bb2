@@ -28,4 +28,12 @@ class TeamObject extends CActiveRecord
         }
         return parent::beforeSave();
     }
+
+    public function getTeamObjects($team_id) {
+        $sql = 'SELECT o.id, o.name, o.type, o.resource_type, to.count 
+                FROM `col_team_objects` AS `to` 
+                LEFT JOIN `col_objects` AS o ON to.object_id = o.id 
+                WHERE to.team_id = ' . intval($team_id);
+        return Yii::app()->db->createCommand($sql)->queryAll();
+    }
 }

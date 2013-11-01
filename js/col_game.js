@@ -45,7 +45,7 @@ function responseProcessing(data) {
         default:
             $('#game-info').append('<h2>Команда: ' + data.team + '</h2><p>Построеные объекты:</p><ul></ul>');
             $.each(data.objects, function(index, value) {
-                $('#game-info ul').append('<li>' + value.name + '</li>');    
+                $('#game-info ul').append('<li>' + value.name + (value.type == 'town' ? (parseInt(value.count) == 1 ? ' (поселение)' : ' (город)') : '') +'</li>');    
             })
 
             $('#game-balance').append('<h2><p>Игровой баланс:</p><ul></ul>');

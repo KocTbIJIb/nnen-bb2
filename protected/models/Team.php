@@ -66,7 +66,7 @@ class Team extends CActiveRecord
         return array_diff($codes, $return);
     }
 
-    public function updateBalance($resource) {
+    public function updateBalanceByResource($resource) {
         if (empty($this->balance)) {
             $balance = new Balance;
             $balance->team_id = $this->id;
@@ -77,20 +77,94 @@ class Team extends CActiveRecord
         return $balance->save();
     }
 
-    public function checkResourceAccessibility($resource) {
+    public function logCode($model, $code) {
+        $team_code = new $model;
+        $team_code->team_id = $this->id;
+        $team_code->code = $code;
+        return $team_code->save();
+    }
+
+    public function checkObjectAccessibility($objectToCheck, $checkForNearRoad = false) {
         foreach ($this->objects as $object) {
-            if ($object->type != 'town') {
+            if ($object->type != 'town' && !$checkForNearRoad) {
+                continue;
+            } else if ($object->type != 'road' && $checkForNearRoad) {
                 continue;
             }
             $criteria = new CDbCriteria;
             $criteria->with = array('neighbors');
             $fullObject = Object::model()->findByPk($object->id, $criteria);
             foreach ($fullObject->neighbors as $town_neighbor) {
-                if ($town_neighbor->id == $resource->object->id) {
+                if ($town_neighbor->id == $objectToCheck->id) {
                     return true;
                 }
             }
         }
         return false;
+    }
+
+    public function alreadyHaveObject($objectToCheck) {
+        $to = TeamObject::model()->findByAttributes(
+            array(
+                'team_id' => $this->id, 
+                'object_id' => $objectToCheck->id
+            )
+        );
+        return empty($to) ? 0 : $to->count;
+    }
+
+    public function isEnoughMoney($money) {
+        foreach ($money as $key => $value) {
+            if (intval($this->balance->{$key}) < $value) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public function buildObject($object, $cost) {
+        if (!$this->charge($cost)) {
+            return false;
+        }
+        if ($object->type == 'town') {
+            $this->updateBalance(array('total' => 1));
+        }
+
+        $to = TeamObject::model()->findByAttributes(array('team_id' => $this->id, 'object_id' => $object->id));
+        if (empty($to)) {
+            $to = new TeamObject;
+            $to->team_id = $this->id;
+            $to->object_id = $object->id;
+        } else {
+            $to->count+= 1;
+        }
+
+        return $to->save();
+    }
+
+    public function charge($money) {
+        $balance = Balance::model()->findByPk($this->id);
+
+        foreach ($money as $key => $value) {
+            if (intval($balance->{$key}) < $value) {
+                return false;
+            } else {
+                $balance->{$key}-= $value;
+            }
+        }
+        return $balance->save();
+    }
+
+    public function updateBalance($money) {
+        $balance = Balance::model()->findByPk($this->id);
+
+        foreach ($money as $key => $value) {
+            if (intval($balance->{$key}) < $value) {
+                return false;
+            } else {
+                $balance->{$key}+= $value;
+            }
+        }
+        return $balance->save();
     }
 }

@@ -4,7 +4,11 @@ class ColonizationController extends EnController
 {
     protected $with = array('col_start_team_codes', 'col_team_codes', 'objects', 'balance');
     protected $preWinCode = 'letmeoutofhere!!!111';
-    protected $winCode = 'JustaperfectdayDrinksangriainthepark';
+    protected $winCode = 'justaperfectdaydrinksangriainthepark';
+
+    protected $roadCost = array('wood' => 1, 'stone' => 1);
+    protected $colonyCost = array('wood' => 1, 'stone' => 1, 'flax' => 1);
+    protected $townCost = array('water' => 3, 'flax' => 2);
 
     public function actionStart()
     {
@@ -21,7 +25,7 @@ class ColonizationController extends EnController
             $criteria->with = array('neighbors');
             $object = Object::model()->findByAttributes(array('initial_code' => $newCode));
             if (empty($object)) {
-                SmsHelper::send('Код не найден: ' . $newCode);
+                SmsHelper::send('Код не найден: ' . $newCode . ' (' . $this->team->name . ')');
                 continue;
             }
             $team_code = new ColStartTeamCode;
@@ -106,7 +110,7 @@ class ColonizationController extends EnController
         
         $this->_sendResponse(array(
             'status' => 'game', 
-            'objects' => $this->team->objects, 
+            'objects' => TeamObject::model()->getTeamObjects($this->team->id),
             'message' => $message,
             'team' => htmlspecialchars($this->team->name)
         ));
@@ -122,45 +126,126 @@ class ColonizationController extends EnController
 
         $codes = CodeHelper::filter(Yii::app()->request->getPost('sectors', array()));
         $resources = CodeHelper::filter(Yii::app()->request->getPost('resources', array()));
-        $resources = empty($_REQUEST['resources']) ? array() : $_REQUEST['resources'];
 
         $newCodes = $this->team->getNewCodes($codes, 'col_team_codes');
         $newResources = $this->team->getNewCodes($resources, 'col_team_codes');
 
+        //Постройка дорог и городов
+        foreach ($newCodes as $newCode) {
+            $codeParts = explode('_', $newCode);
+            if (count($codeParts) != 3) {
+                SmsHelper::send('Код постройки неверен: ' . $newCode . ' (' . $this->team->name . ')');
+                continue;
+            }
+            if ($codeParts[0] == 'дорога') { //Cтроим дорогу
+                $criteria = new CDbCriteria;
+                $criteria->with = array('neighbors');
+                $object = Object::model()->findByAttributes(array('name' => 'Дорога ' . intval($codeParts[1])));
+                if (empty($object) || $object->type != 'road') {
+                    SmsHelper::send('Объект не найден: Дорога ' . $codeParts[1] . ' (' . $this->team->name . ')');
+                    continue;
+                }
+                if (!$this->team->isEnoughMoney($this->roadCost)) {
+                    $message[] = 'Недостаточно средств для постройки дороги!';
+                    $this->team->logCode('ColTeamCode', $newCode);
+                    continue;
+                }
+                if (!$this->team->checkObjectAccessibility($object)) {
+                    $message[] = 'Дорога должна примыкать к уже построеным вами объектам!';
+                    $this->team->logCode('ColTeamCode', $newCode);
+                    continue;
+                }
+                if ($this->team->alreadyHaveObject($object) > 0) {
+                    $message[] = 'Вы уже построили эту дорогу ранее!';
+                    $this->team->logCode('ColTeamCode', $newCode);
+                    continue;
+                }
+                if (!$this->team->buildObject($object, $this->roadCost)) {
+                    SmsHelper::send('Дорога ' . $codeParts[1] . ' почему то не построилась :( (' . $this->team->name . ')');
+                    continue;
+                }
+            } else { //Строим город либо поселение
+                $criteria = new CDbCriteria;
+                $criteria->with = array('neighbors');
+                $object = Object::model()->findByAttributes(array('name' => mb_ucfirst($codeParts[0])));
+                if (empty($object) || $object->type != 'town') {
+                    SmsHelper::send('Объект не найден: ' . $codeParts[0] . ' (' . $this->team->name . ')');
+                    continue;
+                }
 
+
+                $townsHere = $this->team->alreadyHaveObject($object);
+                if ($codeParts[1] == 'поселение') {
+                    if (!$this->team->checkObjectAccessibility($object, true)) {
+                        $message[] = 'Поселение должно примыкать к уже построеным вами объектам!';
+                        $this->team->logCode('ColTeamCode', $newCode);
+                        continue;
+                    }
+                    if ($townsHere != 0) {
+                        $message[] = 'Город либо поселение уже построены на этом месте!';
+                        $this->team->logCode('ColTeamCode', $newCode);
+                        continue;
+                    }
+                    if (!$this->team->isEnoughMoney($this->colonyCost)) {
+                        $message[] = 'Недостаточно средств для постройки поселения!';
+                        $this->team->logCode('ColTeamCode', $newCode);
+                        continue;
+                    }
+                    if (!$this->team->buildObject($object, $this->colonyCost)) {
+                        SmsHelper::send('Поселение ' . $codeParts[1] . ' почему то не построилась :( (' . $this->team->name . ')');
+                        continue;
+                    }
+                } else if ($codeParts[1] == 'город') {
+                    if ($townsHere != 1) {
+                        $message[] = 'Город либо уже построен, либо поселение ещё не построено на этом месте!';
+                        $this->team->logCode('ColTeamCode', $newCode);
+                        continue;
+                    }
+                    if (!$this->team->isEnoughMoney($this->townCost)) {
+                        $message[] = 'Недостаточно средств для постройки города!';
+                        $this->team->logCode('ColTeamCode', $newCode);
+                        continue;
+                    }
+                    if (!$this->team->buildObject($object, $this->townCost)) {
+                        SmsHelper::send('Город ' . $codeParts[1] . ' почему то не построилась :( (' . $this->team->name . ')');
+                        continue;
+                    }
+                }
+            }
+
+            $this->team->refresh();
+        }
         
+        //Зачисление ресурсов
         foreach ($newResources as $resourceCode) {
             $criteria = new CDbCriteria;
             $criteria->with = array('object');
             $resource = ResourceCode::model()->findByAttributes(array('code' => $resourceCode));
             if (empty($resource) || ($resource->object->type != 'resource' && $resource->object->type != 'desert') || empty($resource->object->resource_type)) {
-                SmsHelper::send('Код не найден или код не ресурс: ' . $resourceCode);
+                SmsHelper::send('Код не найден или код не ресурс: ' . $resourceCode . ' (' . $this->team->name . ')');
                 continue;
             }
 
-            if (!$this->team->checkResourceAccessibility($resource)) {
+            if (!$this->team->checkObjectAccessibility($resource->object)) {
                 $message[] = $resource->object->name . ' пока не доступен вашей команде!';
             } else {
-                if (!$this->team->updateBalance($resource)) {
+                if (!$this->team->updateBalanceByResource($resource)) {
                     continue;
                 }
             }
 
-            $team_code = new ColTeamCode;
-            $team_code->team_id = $this->team->id;
-            $team_code->code = $resourceCode;
-            $team_code->save();
+            $this->team->logCode('ColTeamCode', $resourceCode);
+            $this->team->refresh();
         }
-
-        $this->team->refresh();
 
         if ($this->team->checkForColWin()) {
             $this->_sendResponse(array('status' => 'win', 'code' => $this->winCode));
         }
         
+
         $this->_sendResponse(array(
             'status' => 'game', 
-            'objects' => $this->team->objects, 
+            'objects' => TeamObject::model()->getTeamObjects($this->team->id),
             'message' => $message,
             'team' => htmlspecialchars($this->team->name),
             'balance' => $this->team->balance
