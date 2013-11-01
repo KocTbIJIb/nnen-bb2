@@ -20,6 +20,8 @@ class Team extends CActiveRecord
             'cha_team_codes' => array(self::HAS_MANY, 'ChaTeamCode', 'team_id'),
             'total' => array(self::HAS_ONE, 'Total', 'team_id'),
             'team_labels' => array(self::HAS_MANY, 'TeamLabel', 'team_id'),
+            'scr_team_codes' => array(self::HAS_MANY, 'ScrTeamCode', 'team_id'),
+            'score' => array(self::HAS_ONE, 'Score', 'team_id'),
         );
     }
 

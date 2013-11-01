@@ -26,7 +26,6 @@ class ChampionshipController extends EnController
 
         $message = array();
         $codes = CodeHelper::filter(Yii::app()->request->getPost('sectors', array()));
-        $codes = empty($_REQUEST['sectors']) ? array() : CodeHelper::filter($_REQUEST['sectors']);
         $newCodes = $this->team->getNewCodes($codes, 'cha_team_codes');
 
         foreach ($newCodes as $newCode) {
