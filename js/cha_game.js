@@ -96,7 +96,7 @@ function renderLabels() {
         $('#champ-game-field ul').append('<li>Нет текущих меток</li>');
     } else {
         for(var i in champLabels) {
-            var secs = champLabels[i].sinceTaken - diff;
+            var secs = champLabels[i].secondsLeft - diff;
             if (secs <= 0) {
                 clearInterval(champTimeOutId);
                 location.reload();

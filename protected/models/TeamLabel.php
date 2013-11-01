@@ -30,7 +30,7 @@ class TeamLabel extends CActiveRecord
     }
 
     public function getCurrent($team_id, $timeLimit) {
-        $sql = 'SELECT tl.*, ' . $timeLimit . ' - TIMESTAMPDIFF(SECOND, tl.taken, NOW() ) AS sinceTaken
+        $sql = 'SELECT tl.*, ' . $timeLimit . ' - TIMESTAMPDIFF(SECOND, tl.taken, NOW() ) AS secondsLeft
                 FROM `cha_team_labels` AS `tl` 
                 WHERE tl.done IS NULL AND tl.team_id = ' . intval($team_id);
         return Yii::app()->db->createCommand($sql)->queryAll();

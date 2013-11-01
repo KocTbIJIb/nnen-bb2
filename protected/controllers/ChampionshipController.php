@@ -8,6 +8,8 @@ class ChampionshipController extends EnController
     protected $timeLimit = 300;
     protected $totalHandicap = 1800;
 
+    protected $finalCode = 'whatadifferenceadaymakes';
+
     public function actionGame()
     {
         if (empty($this->team->total)) {
@@ -96,6 +98,30 @@ class ChampionshipController extends EnController
     }
 
     public function actionHandicap() {
+        if (empty($this->team->total->handicapStart)) {
+            $this->team->total->handicapStart = new CDbExpression('NOW()');
+            $this->team->total->save();
+            $this->team->refresh();
+        }
+
+        if (empty($this->team->total->handicap)) {
+            $this->team->total->countHandicap($this->totalHandicap);
+            $this->team->refresh();
+        }
+
+        $secs = $this->team->total->getSecondsToCode();
+
+        if ($secs <= 0) {
+            $this->_sendResponse(array(
+                'status' => 'win',
+                'code' => $this->finalCode
+            ));
+        } 
+            
+        $this->_sendResponse(array(
+            'status' => 'wait',
+            'secondsLeft' => $secs
+        ));
 
     }
 

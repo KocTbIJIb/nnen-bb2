@@ -39,4 +39,11 @@ class Total extends CActiveRecord
         return $this->save();
     }
 
+    public function getSecondsToCode() {
+        $sql = 'SELECT TIMESTAMPDIFF(SECOND, handicapStart, NOW() )
+                FROM cha_team_total
+                WHERE team_id = ' . $this->team_id;
+        $diff = intval(Yii::app()->db->createCommand($sql)->queryScalar());
+        return $this->handicap - $diff;
+    }
 }
