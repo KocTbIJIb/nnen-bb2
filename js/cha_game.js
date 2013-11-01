@@ -63,7 +63,6 @@ function responseProcessing(data) {
 }
 
 function pickCallback(data) {
-    console.log('picked!');
     if (typeof(data) == "string") {
         data = eval("(" + data + ")");
     }
