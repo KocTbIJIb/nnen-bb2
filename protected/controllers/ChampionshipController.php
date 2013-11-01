@@ -6,6 +6,7 @@ class ChampionshipController extends EnController
     protected $labelsNum = 40;
     protected $maxCurrentLabels = 3;
     protected $timeLimit = 300;
+    protected $totalHandicap = 1800;
 
     public function actionGame()
     {
@@ -82,8 +83,13 @@ class ChampionshipController extends EnController
     {
         if (empty($this->team->total->finished)) {
             $this->team->total->finished = 1;
-            $this->team->total->finished->save();
+            $this->team->total->save();
         }
+
+        if (empty($this->team->total->handicap) && $this->team->total->isEverybodyFinished()) {
+            $this->team->total->countHandicap($this->totalHandicap);
+        }
+
         $this->_sendResponse(array(
             'status' => 'ok',
         ));
