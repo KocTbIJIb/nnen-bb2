@@ -5,7 +5,11 @@ class CodeHelper extends CComponent
     public static function filter($codes) {
         $return = array();
         foreach ($codes as $code) {
-            $return[] = trim(mb_strtolower($code, 'utf8'));
+            $code = mb_convert_encoding($code, 'UTF-8');
+            $code = strip_tags($code, 'UTF-8');
+            $code = mb_strtolower($code);
+            $code = trim($code);
+            $return[] = $code;
         }
         return array_unique(array_filter($return));
     }

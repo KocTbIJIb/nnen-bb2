@@ -2,17 +2,17 @@
 
 class ColonizationController extends EnController
 {
-    protected $with = array('col_start_team_codes', 'objects');
+    protected $with = array('col_start_team_codes', 'col_team_codes', 'objects', 'balance');
     protected $preWinCode = 'letmeoutofhere!!!111';
+    protected $winCode = 'JustaperfectdayDrinksangriainthepark';
 
     public function actionStart()
     {
-        if ($this->team->checkForPreWin()) {
+        if ($this->team->checkForColPreWin()) {
             $this->_sendResponse(array('status' => 'win', 'code' => $this->preWinCode));    
         }
 
         $codes = CodeHelper::filter(Yii::app()->request->getPost('sectors', array()));
-        //$codes = CodeHelper::filter($_REQUEST['sectors']);
         $newCodes = $this->team->getNewCodes($codes, 'col_start_team_codes');
 
         $message = array();
@@ -96,10 +96,11 @@ class ColonizationController extends EnController
                 $to->save();
             }
 
-            $this->team->refresh();
         }
 
-        if ($this->team->checkForPreWin()) {
+        $this->team->refresh();
+
+        if ($this->team->checkForColPreWin()) {
             $this->_sendResponse(array('status' => 'win', 'code' => $this->preWinCode));    
         }
         
@@ -108,6 +109,61 @@ class ColonizationController extends EnController
             'objects' => $this->team->objects, 
             'message' => $message,
             'team' => htmlspecialchars($this->team->name)
+        ));
+    }
+
+    public function actionGame()
+    {
+        $message = array();
+
+        if ($this->team->checkForColWin()) {
+            $this->_sendResponse(array('status' => 'win', 'code' => $this->winCode));    
+        }
+
+        $codes = CodeHelper::filter(Yii::app()->request->getPost('sectors', array()));
+        $resources = CodeHelper::filter(Yii::app()->request->getPost('resources', array()));
+        $resources = empty($_REQUEST['resources']) ? array() : $_REQUEST['resources'];
+
+        $newCodes = $this->team->getNewCodes($codes, 'col_team_codes');
+        $newResources = $this->team->getNewCodes($resources, 'col_team_codes');
+
+
+        
+        foreach ($newResources as $resourceCode) {
+            $criteria = new CDbCriteria;
+            $criteria->with = array('object');
+            $resource = ResourceCode::model()->findByAttributes(array('code' => $resourceCode));
+            if (empty($resource) || ($resource->object->type != 'resource' && $resource->object->type != 'desert') || empty($resource->object->resource_type)) {
+                SmsHelper::send('Код не найден или код не ресурс: ' . $resourceCode);
+                continue;
+            }
+
+            if (!$this->team->checkResourceAccessibility($resource)) {
+                $message[] = $resource->object->name . ' пока не доступен вашей команде!';
+            } else {
+                if (!$this->team->updateBalance($resource)) {
+                    continue;
+                }
+            }
+
+            $team_code = new ColTeamCode;
+            $team_code->team_id = $this->team->id;
+            $team_code->code = $resourceCode;
+            $team_code->save();
+        }
+
+        $this->team->refresh();
+
+        if ($this->team->checkForColWin()) {
+            $this->_sendResponse(array('status' => 'win', 'code' => $this->winCode));
+        }
+        
+        $this->_sendResponse(array(
+            'status' => 'game', 
+            'objects' => $this->team->objects, 
+            'message' => $message,
+            'team' => htmlspecialchars($this->team->name),
+            'balance' => $this->team->balance
         ));
     }
 
