@@ -52,10 +52,12 @@ function responseProcessing(data) {
         var totalString = new Date(data.table[i].total * 1000);
         var html = '<tr><td>' + (parseInt(i)+1) + '</td>';
             html+= '<td>' + data.table[i].name + '</td>';
-            html+= '<td style="text-align: right">' + totalString.getHours() + ':';
-        var minutes = totalString.getMinutes() < 10 ? '0' + totalString.getMinutes() : totalString.getMinutes();
+            html+= '<td style="text-align: right">' + parseInt(data.table[i].total / 3600) + ':';
+        var minutes = parseInt((data.table[i].total % 3600) / 60);
+            minutes = minutes < 10 ? '0' + minutes : minutes;
             html+= minutes + ':';
-        var seconds = totalString.getSeconds() < 10 ? '0' + totalString.getSeconds() : totalString.getSeconds();
+        var seconds = data.table[i].total % 60;
+            seconds = seconds < 10 ? '0' + seconds : seconds;
             html+= seconds + '</td></tr>';
         $('#champ-content table').append(html);
         
