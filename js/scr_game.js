@@ -31,6 +31,7 @@ function responseProcessing(data) {
     if (typeof(data) == "string") {
         data = eval("(" + data + ")");
     }
+    $('#game-team-name').append('<h1>Команда: ' + data.team + '</h1>');
     if (data.status == 'win') {
         $('#scr-score').html('Проходной код: <span style="color:#FFC0CB">' + data.code + '</span>');
     }

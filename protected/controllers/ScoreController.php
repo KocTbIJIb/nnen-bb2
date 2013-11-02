@@ -17,7 +17,11 @@ class ScoreController extends EnController
             $score->save();
             $this->team->refresh();
         } else if ($this->team->score->score >= $this->aimScore) {
-            $this->_sendResponse(array('status' => 'win', 'code' => $this->finalCode));    
+            $this->_sendResponse(array(
+                'status' => 'win', 
+                'code' => $this->finalCode, 
+                'team' => htmlspecialchars($this->team->name)
+            ));    
         }
 
         $codes = CodeHelper::filter(Yii::app()->request->getPost('sectors', array()));
@@ -41,10 +45,14 @@ class ScoreController extends EnController
         }
 
         if ($this->team->score->score >= $this->aimScore) {
-            $this->_sendResponse(array('status' => 'win', 'code' => $this->finalCode));
+            $this->_sendResponse(array(
+                'status' => 'win', 
+                'code' => $this->finalCode, 
+                'team' => htmlspecialchars($this->team->name)
+            ));
         }
 
-        $this->_sendResponse(array('status' => 'game'));
+        $this->_sendResponse(array('status' => 'game', 'team' => htmlspecialchars($this->team->name)));
     }
 
     public function actionCheck()
