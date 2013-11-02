@@ -251,4 +251,27 @@ class ColonizationController extends EnController
         ));
     }
 
+    public function actionExchange()
+    {
+        $resources_types = array('wood','stone','flax','water');
+        $num = intval(Yii::app()->request->getPost('num', 0));
+        if (!$num || $num % 4) {
+            $this->_sendResponse(array('status' => 'error', 'error' => 'Обмениваемая сумма должна быть кратна четырем'));
+        }
+        $from = Yii::app()->request->getPost('from', '');
+        $to = Yii::app()->request->getPost('to', '');
+        if (!in_array($from, $resources_types) || !in_array($to, $resources_types) || $from == $to) {
+            $this->_sendResponse(array('status' => 'error', 'error' => 'Типы ресурсов указаны неверно'));
+        }
+
+        if ($this->team->balance->{$from} < $num) {
+            $this->_sendResponse(array('status' => 'error', 'error' => 'Недостаточно ресурсов'));
+        }
+
+        $this->team->balance->{$from}-= $num;
+        $this->team->balance->{$to}+= intval($num / 4);
+        $this->team->balance->save();
+        $this->_sendResponse(array('status' => 'ok'));
+    }
+
 }

@@ -34,10 +34,21 @@ function responseProcessing(data) {
             break;
         case 'game':
         default:
-            $('#game-info').append('<h2>Команда: ' + data.team + '</h2><p>Построеные объекты:</p><ul></ul>');
+            $('#game-team-name').append('<h1>Команда: ' + data.team + '</h1>');
+
+            $('#game-info').append('<p>Построеные объекты:</p>');
+            $('#game-info').append('<div id="game-roads"><p>Дороги:</p><ul></ul></div>');
+            $('#game-info').append('<div id="game-towns"><p>Города:</p><ul></ul></div>');
             $.each(data.objects, function(index, value) {
-                $('#game-info ul').append('<li>' + value.name + '</li>');    
+                console.log(value);
+                if (value.type == 'road') {
+                    $('#game-roads ul').append('<li>' + value.name +'</li>');
+                } else {
+                    $('#game-towns ul').append('<li>' + value.name + (parseInt(value.count) == 1 ? ' (поселение)' : ' (город)') + '</li>');
+                }
             })
+            $('#game-info').append('<div style="clear:both"></div>');
+            
             if (data.message.length > 0) {
                 $('#win-code').html(data.message.join('; '));
             }

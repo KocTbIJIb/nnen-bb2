@@ -1,0 +1,38 @@
+#game-team-name {
+    margin-top: 20px;
+}
+#game-balance p, 
+#game-info p,
+#game-exchange p {
+    margin: 20px 0px 10px 0px;
+    font-size: 26px;
+}
+#game-balance ul li {
+    float: left;
+    width: 19%;
+    font-size: 20px;
+}
+#game-info {
+    margin-top: 20px;
+}
+#game-roads,
+#game-towns {
+    width: 20%;
+    float: left;
+}
+
+#game-roads p,
+#game-towns p {
+    margin: 0px 0px 5px 0px;
+    font-size: 20px;
+    text-decoration: underline;
+}
+#game-exchange span {
+    font-size: 12px;
+}
+#game-exchange select {
+    margin-right: 10px;
+}
+#game-exchange a {
+    font-size: 20px;
+}
