@@ -59,7 +59,10 @@ function responseProcessing(data) {
             })
             $('#game-info').append('<div style="clear:both"></div>');
 
-            colBalance = data.balance;
+            if (data.balance) {
+                colBalance = data.balance;    
+            }
+            
             $('#game-balance').append('<p>Игровой баланс:</p><ul></ul>');
             $('#game-balance ul').append('<li>Дерево: ' + (data.balance ? parseInt(data.balance.wood) : 0) + '</li>');
             $('#game-balance ul').append('<li>Камень: ' + (data.balance ? parseInt(data.balance.stone) : 0) + '</li>');
