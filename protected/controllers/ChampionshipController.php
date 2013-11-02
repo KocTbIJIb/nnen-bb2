@@ -9,15 +9,15 @@ class ChampionshipController extends EnController
     protected $totalHandicap = 1800;
 
     protected $finalCodes = array(
-        1 => '1',
-        2 => '2',
-        3 => '3',
-        4 => '4',
-        5 => '5',
-        6 => '6',
-        7 => '7',
-        8 => '8',
-        9 => '9',
+        1 => 'voluptatem',
+        2 => 'doorem',
+        3 => 'consectur',
+        4 => 'accudsamus',
+        5 => 'asperioresd',
+        6 => 'eum',
+        7 => 'weaknesss',
+        8 => 'eery',
+        9 => 'maxime',
         10 => 'whatadifferenceadaymakes'
     );
 
