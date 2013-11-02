@@ -52,7 +52,7 @@ class ChampionshipController extends EnController
             $team_code->code = $newCode;
             $team_code->save();
 
-            $teamLabel = TeamLabel::model()->findByAttributes(array('label_id' => $label->label_id));
+            $teamLabel = TeamLabel::model()->findByAttributes(array('label_id' => $label->label_id, 'team_id' => $this->team->id));
             if (empty($teamLabel) || !empty($teamLabel->done)) {
                 continue;
             }
