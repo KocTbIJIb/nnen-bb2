@@ -40,6 +40,7 @@ function responseProcessing(data) {
     if (typeof(data) == "string") {
         data = eval("(" + data + ")");
     }
+    $('#game-team-name').append('<h1>Команда: ' + data.team + '</h1>');
 
     $('#champ-game-field').append('<p>Текущие метки: </p><ul></ul>');
     champLabels = data.current;
