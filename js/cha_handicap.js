@@ -24,7 +24,7 @@ function responseProcessing(data) {
     }
 
     if (data.status == 'win') {
-        $('#champ-result').html('<h1>Проходной код: ' + data.code + '</h1>');
+        $('#champ-result').html('<h1>Ваш код: ' + data.code + '</h1>');
         return;
     } 
 
