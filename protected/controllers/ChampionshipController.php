@@ -8,7 +8,18 @@ class ChampionshipController extends EnController
     protected $timeLimit = 300;
     protected $totalHandicap = 1800;
 
-    protected $finalCode = 'whatadifferenceadaymakes';
+    protected $finalCodes = array(
+        1 => '1',
+        2 => '2',
+        3 => '3',
+        4 => '4',
+        5 => '5',
+        6 => '6',
+        7 => '7',
+        8 => '8',
+        9 => '9',
+        10 => 'whatadifferenceadaymakes'
+    );
 
     public function actionGame()
     {
@@ -82,6 +93,16 @@ class ChampionshipController extends EnController
 
     public function actionFinish()
     {
+        if (empty($this->team->total)) {
+            $total = new Total;
+            $total->team_id = $this->team->id;
+            $total->total = $this->labelsNum * $this->timeLimit;
+            $total->finished = 1;
+            $total->save();
+
+            $this->team->refresh();
+        }
+
         if (empty($this->team->total->finished)) {
             $this->team->total->finished = 1;
             $this->team->total->save();
@@ -97,6 +118,15 @@ class ChampionshipController extends EnController
     }
 
     public function actionHandicap() {
+        if (empty($this->team->total)) {
+            $total = new Total;
+            $total->team_id = $this->team->id;
+            $total->total = $this->labelsNum * $this->timeLimit;
+            $total->save();
+
+            $this->team->refresh();
+        }
+
         if (empty($this->team->total->handicapStart)) {
             $this->team->total->handicapStart = new CDbExpression('NOW()');
             $this->team->total->save();
@@ -111,9 +141,18 @@ class ChampionshipController extends EnController
         $secs = $this->team->total->getSecondsToCode();
 
         if ($secs <= 0) {
+            if (empty($this->team->total->place)) {
+                $place = $this->team->total->getPlace();
+                $this->team->total->place = $place;
+                $this->team->total->save();
+            } else {
+                $place = $this->team->total->place;
+            }
+            
+
             $this->_sendResponse(array(
                 'status' => 'win',
-                'code' => $this->finalCode
+                'code' => $this->finalCodes[($place >= 10 ? 10 : $place)]
             ));
         } 
             

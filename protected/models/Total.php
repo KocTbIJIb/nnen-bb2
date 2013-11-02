@@ -46,4 +46,11 @@ class Total extends CActiveRecord
         $diff = intval(Yii::app()->db->createCommand($sql)->queryScalar());
         return $this->handicap - $diff;
     }
+
+    public function getPlace() {
+        $sql = 'SELECT MAX( place ) AS max
+                FROM cha_team_total
+                WHERE 1';
+        return intval(Yii::app()->db->createCommand($sql)->queryScalar()) + 1;    
+    }
 }
