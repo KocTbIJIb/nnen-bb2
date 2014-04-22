@@ -1,4 +1,6 @@
 nnen-bb2
 ========
 
-Server side part of Breaking Bad 2 game (http://52.en.cx/GameDetails.aspx?gid=43920)
+Серверная часть игры Breaking Bad 2
+
+Описание механики встраивания всего этого богатства в энковский движок напишу когда нибудь. Может даже скоро.
