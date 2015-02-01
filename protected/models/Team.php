@@ -187,4 +187,23 @@ class Team extends CActiveRecord
         }
         return $teams;
     }
+
+    public static function findByHash($hash, $with)
+    {
+        $criteria = new CDbCriteria;
+        $criteria->with = $with;
+        return self::model()->findByAttributes(array('hash' => $hash), $criteria);
+    }
+
+    public function getTotal()
+    {
+        return empty($this->total) ? new Total : $this->total;
+    }
+
+    public function clearExpiredLabels()
+    {
+        /** @var $model TeamLabel */
+        $model = TeamLabel::model();
+        $model->clearExpired($this->id, Total::TIME_LIMIT);
+    }
 }

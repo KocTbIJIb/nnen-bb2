@@ -29,4 +29,11 @@ class ChaTeamCode extends CActiveRecord
         }
         return parent::beforeSave();
     }
+
+    public static function logCode($team_id, $code) {
+        $team_code = new self;
+        $team_code->team_id = $team_id;
+        $team_code->code = $code;
+        $team_code->save();
+    }
 }

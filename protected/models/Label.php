@@ -21,4 +21,9 @@ class Label extends CActiveRecord
         return array(
         );
     }
+
+    public static function findByCode($code)
+    {
+        return self::model()->findByAttributes(array('code' => $code));
+    }
 }

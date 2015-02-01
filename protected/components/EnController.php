@@ -28,17 +28,28 @@ class EnController extends CController
 
     private function _checkAuth()
     {
-        if (empty($_REQUEST['team_hash'])) {
+        $team_hash = Yii::app()->request->getParam('team_hash');
+        if (empty($team_hash)) {
             $this->_sendResponse(array('status' => 'error', 'message' => 'Unauthorized'));
         }
 
-        $team_hash = $_REQUEST['team_hash'];
-        $criteria = new CDbCriteria;
-        $criteria->with = $this->with;
-        $team = Team::model()->findByAttributes(array('hash' => $team_hash), $criteria);
+        $team = Team::findByHash($team_hash, $this->with);
         if (empty($team)) {
             $this->_sendResponse(array('status' => 'error', 'message' => 'Unauthorized'));
         }
+        $this->setTeam($team);
+    }
+
+    /**
+     * @return Team
+     */
+    public function getTeam()
+    {
+        return empty($this->team) ? null : $this->team;
+    }
+
+    public function setTeam(Team $team)
+    {
         $this->team = $team;
     }
 }
